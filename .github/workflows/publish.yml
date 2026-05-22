@@ -1,0 +1,180 @@
+name: Publish to Stores
+
+# Triggered automatically when a GitHub release is published, or manually
+# to (re-)submit a specific release tag to the stores.
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to publish (e.g. v1.0.0)"
+        required: true
+
+env:
+  RELEASE_TAG: ${{ github.event_name == 'release' && github.event.release.tag_name || inputs.tag }}
+
+jobs:
+  publish-chrome:
+    name: Chrome Web Store
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download release artifact
+        run: gh release download "$RELEASE_TAG" --pattern extension-chromium.zip
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+
+      # Secrets: CHROME_EXTENSION_ID, CHROME_CLIENT_ID, CHROME_CLIENT_SECRET, CHROME_REFRESH_TOKEN
+      # Obtain via: https://github.com/nicholasgasior/chrome-web-store-api
+      - name: Upload and publish to Chrome Web Store
+        run: >
+          npx chrome-webstore-upload-cli@3
+          upload
+          --source extension-chromium.zip
+          --extension-id "${{ secrets.CHROME_EXTENSION_ID }}"
+          --client-id "${{ secrets.CHROME_CLIENT_ID }}"
+          --client-secret "${{ secrets.CHROME_CLIENT_SECRET }}"
+          --refresh-token "${{ secrets.CHROME_REFRESH_TOKEN }}"
+          --auto-publish
+
+  publish-edge:
+    name: Microsoft Edge Add-ons
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download release artifact
+        run: gh release download "$RELEASE_TAG" --pattern extension-chromium.zip
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+
+      # Secrets: EDGE_PRODUCT_ID, EDGE_CLIENT_ID, EDGE_CLIENT_SECRET, EDGE_ACCESS_TOKEN_URL
+      # Obtain via: https://learn.microsoft.com/en-us/microsoft-edge/extensions-chromium/publish/api/using-addons-api
+      - name: Upload and publish to Edge Add-ons
+        run: >
+          npx edge-addons-api@1
+          submit
+          --product-id "${{ secrets.EDGE_PRODUCT_ID }}"
+          --client-id "${{ secrets.EDGE_CLIENT_ID }}"
+          --client-secret "${{ secrets.EDGE_CLIENT_SECRET }}"
+          --access-token-url "${{ secrets.EDGE_ACCESS_TOKEN_URL }}"
+          --zip ./extension-chromium.zip
+
+  publish-firefox:
+    name: Firefox Add-ons (AMO)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download release artifact
+        run: gh release download "$RELEASE_TAG" --pattern extension-firefox.zip
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+
+      - name: Unzip extension
+        run: unzip extension-firefox.zip -d dist-firefox/
+
+      # Secrets: AMO_JWT_ISSUER, AMO_JWT_SECRET
+      # Obtain via: https://addons.mozilla.org/developers/addon/api/key/
+      - name: Submit to AMO
+        run: >
+          npx web-ext@8 sign
+          --source-dir ./dist-firefox
+          --channel listed
+          --api-key "${{ secrets.AMO_JWT_ISSUER }}"
+          --api-secret "${{ secrets.AMO_JWT_SECRET }}"
+
+  publish-safari:
+    name: Safari (Mac App Store)
+    runs-on: macos-latest
+    steps:
+      - name: Download release artifact
+        run: gh release download "$RELEASE_TAG" --pattern extension-chromium.zip
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+
+      - name: Unzip extension
+        run: unzip extension-chromium.zip -d dist/
+
+      # Write the App Store Connect API private key where Xcode can find it
+      # Secrets: APP_STORE_CONNECT_API_KEY (p8 contents), APP_STORE_CONNECT_API_KEY_ID, APP_STORE_CONNECT_ISSUER_ID
+      # Obtain via: https://appstoreconnect.apple.com/access/api
+      - name: Set up App Store Connect API key
+        run: |
+          mkdir -p ~/.private_keys
+          echo "${{ secrets.APP_STORE_CONNECT_API_KEY }}" \
+            > ~/.private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8
+
+      # Secrets: APPLE_CERTIFICATE_BASE64 (base64-encoded .p12), APPLE_CERTIFICATE_PASSWORD
+      # Export from Keychain Access: certificate + private key → Export as .p12 → base64 encode
+      - name: Import Distribution certificate
+        run: |
+          KEYCHAIN="$RUNNER_TEMP/build.keychain"
+          CERT="$RUNNER_TEMP/certificate.p12"
+          echo "${{ secrets.APPLE_CERTIFICATE_BASE64 }}" | base64 --decode > "$CERT"
+          security create-keychain -p "ci" "$KEYCHAIN"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN"
+          security unlock-keychain -p "ci" "$KEYCHAIN"
+          security import "$CERT" -k "$KEYCHAIN" \
+            -P "${{ secrets.APPLE_CERTIFICATE_PASSWORD }}" \
+            -T /usr/bin/codesign
+          security list-keychain -d user -s "$KEYCHAIN"
+          security set-key-partition-list \
+            -S apple-tool:,apple:,codesign: -s -k "ci" "$KEYCHAIN"
+
+      # Generates an Xcode project from the extension. The app record must already
+      # exist in App Store Connect (create it once manually via Xcode or the web UI).
+      # Secrets: APPLE_DEVELOPMENT_TEAM (10-character team ID from developer.apple.com)
+      - name: Convert web extension to Xcode project
+        run: |
+          xcrun safari-web-extension-converter dist/ \
+            --app-name "Doom-Scroll Blocker" \
+            --bundle-identifier dev.kuech.doom-scroll-blocker \
+            --macos-only \
+            --no-open
+
+      - name: Archive
+        run: |
+          xcodebuild archive \
+            -scheme "Doom-Scroll Blocker" \
+            -archivePath "$RUNNER_TEMP/DoomScrollBlocker.xcarchive" \
+            -destination "generic/platform=macOS" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath \
+              ~/.private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8 \
+            -authenticationKeyID "${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}" \
+            -authenticationKeyIssuerID "${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}" \
+            CODE_SIGN_STYLE=Automatic \
+            DEVELOPMENT_TEAM="${{ secrets.APPLE_DEVELOPMENT_TEAM }}"
+
+      - name: Export for App Store
+        run: |
+          cat > "$RUNNER_TEMP/ExportOptions.plist" << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store-connect</string>
+            <key>signingStyle</key>
+            <string>automatic</string>
+          </dict>
+          </plist>
+          EOF
+          xcodebuild -exportArchive \
+            -archivePath "$RUNNER_TEMP/DoomScrollBlocker.xcarchive" \
+            -exportPath "$RUNNER_TEMP/export" \
+            -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
+            -allowProvisioningUpdates \
+            -authenticationKeyPath \
+              ~/.private_keys/AuthKey_${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}.p8 \
+            -authenticationKeyID "${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}" \
+            -authenticationKeyIssuerID "${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}"
+
+      - name: Upload to App Store Connect
+        run: |
+          xcrun altool --upload-app \
+            --file "$(find "$RUNNER_TEMP/export" -name '*.pkg' | head -1)" \
+            --type macos \
+            --apiKey "${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}" \
+            --apiIssuer "${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}"

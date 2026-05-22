@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Doom-Scroll Blocker</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      width: 300px;
+      font-family: system-ui, -apple-system, sans-serif;
+      font-size: 13px;
+      background: #0f0f11;
+      color: #e2e2e5;
+    }
+
+    header {
+      padding: 12px 14px 10px;
+      border-bottom: 1px solid #2e2e33;
+    }
+    header h1 {
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: -0.01em;
+    }
+
+    #sites-list { padding: 4px 0; }
+
+    .site-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 14px;
+      cursor: pointer;
+      user-select: none;
+    }
+    .site-row:hover { background: #18181b; }
+
+    /* Toggle switch */
+    .toggle { position: relative; width: 34px; height: 18px; flex-shrink: 0; }
+    .toggle input { opacity: 0; width: 0; height: 0; position: absolute; }
+    .track {
+      position: absolute; inset: 0;
+      background: #3a3a3f;
+      border-radius: 18px;
+      transition: background 0.18s;
+    }
+    .track::after {
+      content: '';
+      position: absolute;
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: #fff;
+      top: 3px; left: 3px;
+      transition: transform 0.18s;
+    }
+    .toggle input:checked ~ .track { background: #2563eb; }
+    .toggle input:checked ~ .track::after { transform: translateX(16px); }
+    .toggle input:focus-visible ~ .track { outline: 2px solid #2563eb; outline-offset: 2px; }
+
+    #challenge {
+      padding: 10px 14px 12px;
+      border-top: 1px solid #2e2e33;
+      background: #18181b;
+    }
+    #challenge p { color: #888; margin-bottom: 8px; }
+    #challenge strong {
+      color: #e2e2e5;
+      font-family: ui-monospace, monospace;
+      font-size: 14px;
+    }
+    .challenge-row { display: flex; gap: 6px; align-items: center; }
+    #answer {
+      width: 72px;
+      padding: 5px 8px;
+      background: #0f0f11;
+      border: 1px solid #2e2e33;
+      border-radius: 6px;
+      color: #e2e2e5;
+      font-size: 14px;
+      font-family: ui-monospace, monospace;
+      outline: none;
+    }
+    #answer:focus { border-color: #2563eb; }
+    #challenge-error { color: #ef4444; font-size: 12px; margin-top: 6px; }
+
+    footer {
+      padding: 10px 14px;
+      border-top: 1px solid #2e2e33;
+      display: flex;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+
+    button {
+      font: inherit;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 5px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    button:hover:not(:disabled) { opacity: 0.8; }
+    button:disabled { opacity: 0.35; cursor: default; }
+
+    .btn-confirm {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+    }
+    .btn-save {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+    }
+    .btn-save.saved {
+      background: #16a34a;
+      pointer-events: none;
+    }
+
+    .info-bar {
+      padding: 8px 14px;
+      border-top: 1px solid #2e2e33;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      font-size: 11px;
+      color: #555;
+    }
+    .info-bar a {
+      color: #555;
+      text-decoration: none;
+    }
+    .info-bar a:hover { color: #888; }
+  </style>
+</head>
+<body>
+  <header><h1>Doom-Scroll Blocker</h1></header>
+
+  <div id="sites-list"></div>
+
+  <section id="challenge" hidden>
+    <p>To save, solve: <strong id="problem"></strong></p>
+    <div class="challenge-row">
+      <input id="answer" type="number" placeholder="?" autocomplete="off" />
+      <button class="btn-confirm" id="btn-confirm">Confirm</button>
+    </div>
+    <div id="challenge-error" hidden>Incorrect — try again.</div>
+  </section>
+
+  <footer>
+    <button class="btn-save" id="btn-save" disabled>Save</button>
+  </footer>
+
+  <div class="info-bar">
+    <a href="https://github.com/chriskuech/doom-scroll-blocker/issues" target="_blank">Report a bug or request a feature</a>
+    <span>·</span>
+    <a href="https://github.com/chriskuech/doom-scroll-blocker" target="_blank">Support this project</a>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

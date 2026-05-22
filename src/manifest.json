@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Doom-Scroll Blocker",
+  "version": "1",
+  "description": "Blocks doom-scrolling feeds while allowing direct links to specific content",
+
+  "permissions": ["webNavigation", "tabs", "storage"],
+  "host_permissions": [
+    "*://*.reddit.com/*",
+    "*://*.twitter.com/*",
+    "*://*.x.com/*",
+    "*://*.instagram.com/*",
+    "*://*.tiktok.com/*",
+    "*://*.facebook.com/*",
+    "*://*.youtube.com/*",
+    "*://*.linkedin.com/*",
+    "*://*.threads.net/*",
+    "*://*.bsky.app/*",
+    "*://*.pinterest.com/*"
+  ],
+
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Doom-Scroll Blocker"
+  },
+
+  "web_accessible_resources": [
+    {
+      "resources": ["blocked.html", "blocked.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

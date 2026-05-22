@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blocked — Doom-Scroll Blocker</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #0f0f11;
+      color: #e2e2e5;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .icon {
+      font-size: 3.5rem;
+      line-height: 1;
+      user-select: none;
+    }
+
+    h1 {
+      font-size: 1.75rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+
+    .site {
+      font-size: 1rem;
+      color: #888;
+      font-family: ui-monospace, monospace;
+      background: #1c1c1f;
+      border: 1px solid #2e2e33;
+      border-radius: 6px;
+      padding: 0.35em 0.75em;
+    }
+
+    p {
+      font-size: 1rem;
+      color: #999;
+      max-width: 36ch;
+      line-height: 1.6;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: 0.5rem;
+    }
+
+    button {
+      font-size: 0.9rem;
+      font-family: inherit;
+      border-radius: 8px;
+      padding: 0.55em 1.25em;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    button:hover { opacity: 0.8; }
+
+    .btn-back {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+    }
+
+    .btn-proceed {
+      background: transparent;
+      color: #666;
+      border: 1px solid #2e2e33;
+    }
+    .btn-proceed:hover { color: #999; }
+  </style>
+</head>
+<body>
+  <div class="icon">🚫</div>
+  <h1>Doom-scroll blocked</h1>
+  <span class="site" id="site">this site</span>
+  <p>You blocked this feed to stay focused. There's nothing here worth losing your time over.</p>
+  <div class="actions">
+    <button class="btn-back" onclick="history.back()">Go back</button>
+    <button class="btn-proceed" id="proceed-btn">Proceed anyway</button>
+  </div>
+
+  <script src="blocked.js"></script>
+</body>
+</html>
