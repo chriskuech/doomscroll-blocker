@@ -2,11 +2,13 @@ declare const browser: typeof chrome | undefined;
 const api = typeof browser !== 'undefined' ? browser : chrome;
 
 export interface Settings {
-  /** Site IDs for which blocking is currently disabled. */
+  /** Stable/beta site IDs for which blocking is disabled. */
   disabledSites: string[];
+  /** Alpha site IDs for which blocking is explicitly enabled (opt-in). */
+  enabledAlphaSites: string[];
 }
 
-const DEFAULTS: Settings = { disabledSites: [] };
+const DEFAULTS: Settings = { disabledSites: [], enabledAlphaSites: [] };
 
 export async function getSettings(): Promise<Settings> {
   const result = await api.storage.sync.get(DEFAULTS);

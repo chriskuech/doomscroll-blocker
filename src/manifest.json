@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "Doom-Scroll Blocker",
+  "name": "Doomscroll Blocker",
   "version": "1",
-  "description": "Blocks doom-scrolling feeds while allowing direct links to specific content",
+  "description": "Blocks doomscrolling feeds while allowing direct links to specific content",
 
   "permissions": ["webNavigation", "tabs", "storage"],
   "host_permissions": [
@@ -26,7 +26,7 @@
 
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Doom-Scroll Blocker"
+    "default_title": "Doomscroll Blocker"
   },
 
   "web_accessible_resources": [

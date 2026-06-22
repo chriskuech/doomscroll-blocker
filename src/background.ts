@@ -1,11 +1,11 @@
-import { compileDenylist, type CompiledDenylist } from './denylist.js';
+import { loadDenylist, type Denylist } from './denylist.js';
 import { getSettings } from './storage.js';
-import rawDenylist from './denylist.json';
 
 declare const browser: typeof chrome | undefined;
 const api = typeof browser !== 'undefined' ? browser : chrome;
 
-let denylist: CompiledDenylist = {
+let denylist: Denylist = {
+  sites: [],
   hostnameToSiteId: new Map(),
   rulesBySiteId: new Map(),
 };
@@ -13,8 +13,8 @@ let denylist: CompiledDenylist = {
 let disabledSites = new Set<string>();
 
 async function init(): Promise<void> {
-  const settings = await getSettings();
-  denylist = compileDenylist(rawDenylist);
+  const [settings, loaded] = await Promise.all([getSettings(), loadDenylist()]);
+  denylist = loaded;
   disabledSites = new Set(settings.disabledSites);
 }
 
@@ -41,12 +41,21 @@ function isBlocked(urlStr: string): boolean {
   return rules.blocked.some(re => re.test(parsed.pathname));
 }
 
-api.webNavigation.onBeforeNavigate.addListener(({ tabId, url, frameId }) => {
+function blockIfNeeded(tabId: number, url: string, frameId: number): void {
   if (frameId !== 0) return;
   if (!isBlocked(url)) return;
 
   const blockedPage = api.runtime.getURL('blocked.html') + '?url=' + encodeURIComponent(url);
   void api.tabs.update(tabId, { url: blockedPage });
+}
+
+api.webNavigation.onBeforeNavigate.addListener(({ tabId, url, frameId }) => {
+  blockIfNeeded(tabId, url, frameId);
+});
+
+// Catches client-side push-state navigation (SPAs like Reddit).
+api.webNavigation.onHistoryStateUpdated.addListener(({ tabId, url, frameId }) => {
+  blockIfNeeded(tabId, url, frameId);
 });
 
 void init();

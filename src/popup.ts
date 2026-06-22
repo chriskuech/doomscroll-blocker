@@ -1,7 +1,10 @@
-import rawDenylist from './denylist.json';
+import { loadDenylist, type SiteMetadata } from './denylist.js';
 import { getSettings, saveSettings } from './storage.js';
 
-const SITES = Object.entries(rawDenylist).map(([id, site]) => ({ id, label: site.label }));
+const RELEASE_RANK: Record<string, number> = { stable: 0, beta: 1, alpha: 2 };
+const BADGE_TEXT: Record<string, string> = { alpha: 'α', beta: 'β' };
+
+let SITES: SiteMetadata[] = [];
 
 // ── DOM refs ──────────────────────────────────────────────────────────────────
 
@@ -32,6 +35,13 @@ function renderList(): void {
 
     const nameSpan = document.createElement('span');
     nameSpan.textContent = site.label;
+    const badge = BADGE_TEXT[site.release];
+    if (badge) {
+      const sup = document.createElement('sup');
+      sup.className = 'release-badge';
+      sup.textContent = badge;
+      nameSpan.append(sup);
+    }
 
     const toggleWrap = document.createElement('span');
     toggleWrap.className = 'toggle';
@@ -88,8 +98,9 @@ async function confirmSave(): Promise<void> {
     return;
   }
 
-  const disabledSites = SITES.filter(s => !currentState[s.id]).map(s => s.id);
-  await saveSettings({ disabledSites });
+  const disabledSites = SITES.filter(s => s.release !== 'alpha' && !currentState[s.id]).map(s => s.id);
+  const enabledAlphaSites = SITES.filter(s => s.release === 'alpha' && currentState[s.id]).map(s => s.id);
+  await saveSettings({ disabledSites, enabledAlphaSites });
 
   savedState = { ...currentState };
   isDirty = false;
@@ -123,10 +134,19 @@ window.addEventListener('blur', () => {
 // ── Init ──────────────────────────────────────────────────────────────────────
 
 async function init(): Promise<void> {
-  const { disabledSites } = await getSettings();
+  const [{ disabledSites, enabledAlphaSites }, denylist] = await Promise.all([
+    getSettings(),
+    loadDenylist(),
+  ]);
+  SITES = denylist.sites.sort((a, b) =>
+    (RELEASE_RANK[a.release] - RELEASE_RANK[b.release]) || a.label.localeCompare(b.label)
+  );
   const disabled = new Set(disabledSites);
+  const enabledAlpha = new Set(enabledAlphaSites);
   for (const site of SITES) {
-    const enabled = !disabled.has(site.id);
+    const enabled = site.release === 'alpha'
+      ? enabledAlpha.has(site.id)
+      : !disabled.has(site.id);
     savedState[site.id] = enabled;
     currentState[site.id] = enabled;
   }

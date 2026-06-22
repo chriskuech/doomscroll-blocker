@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Blocked — Doom-Scroll Blocker</title>
+  <title>Blocked — Doomscroll Blocker</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -51,48 +51,13 @@
       line-height: 1.6;
     }
 
-    .actions {
-      display: flex;
-      gap: 0.75rem;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-top: 0.5rem;
-    }
-
-    button {
-      font-size: 0.9rem;
-      font-family: inherit;
-      border-radius: 8px;
-      padding: 0.55em 1.25em;
-      cursor: pointer;
-      transition: opacity 0.15s;
-    }
-    button:hover { opacity: 0.8; }
-
-    .btn-back {
-      background: #2563eb;
-      color: #fff;
-      border: none;
-    }
-
-    .btn-proceed {
-      background: transparent;
-      color: #666;
-      border: 1px solid #2e2e33;
-    }
-    .btn-proceed:hover { color: #999; }
   </style>
 </head>
 <body>
   <div class="icon">🚫</div>
-  <h1>Doom-scroll blocked</h1>
+  <h1>Doomscroll blocked</h1>
   <span class="site" id="site">this site</span>
   <p>You blocked this feed to stay focused. There's nothing here worth losing your time over.</p>
-  <div class="actions">
-    <button class="btn-back" onclick="history.back()">Go back</button>
-    <button class="btn-proceed" id="proceed-btn">Proceed anyway</button>
-  </div>
-
   <script src="blocked.js"></script>
 </body>
 </html>

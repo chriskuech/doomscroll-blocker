@@ -3,60 +3,70 @@
     "label": "Reddit",
     "hosts": ["reddit.com", "old.reddit.com"],
     "blocked": ["/**"],
-    "allowed": ["/r/*/comments/**"]
+    "allowed": ["/r/*/comments/**"],
+    "release": "stable"
   },
   "twitter": {
     "label": "Twitter / X",
     "hosts": ["twitter.com", "x.com"],
     "blocked": ["/**"],
-    "allowed": ["/*/status/**"]
+    "allowed": ["/*/status/**"],
+    "release": "beta"
   },
   "instagram": {
     "label": "Instagram",
     "hosts": ["instagram.com"],
     "blocked": ["/**"],
-    "allowed": ["/p/**", "/reel/**"]
+    "allowed": ["/p/**", "/reel/**"],
+    "release": "beta"
   },
   "tiktok": {
     "label": "TikTok",
     "hosts": ["tiktok.com"],
     "blocked": ["/**"],
-    "allowed": ["/@*/video/**"]
+    "allowed": ["/@*/video/**"],
+    "release": "alpha"
   },
   "facebook": {
     "label": "Facebook",
     "hosts": ["facebook.com", "m.facebook.com"],
     "blocked": ["/**"],
-    "allowed": []
+    "allowed": [],
+    "release": "beta"
   },
   "youtube": {
     "label": "YouTube",
     "hosts": ["youtube.com", "m.youtube.com"],
     "blocked": ["/**"],
-    "allowed": ["/watch", "/shorts/**", "/embed/**"]
+    "allowed": ["/watch", "/shorts/**", "/embed/**"],
+    "release": "stable"
   },
   "linkedin": {
     "label": "LinkedIn",
     "hosts": ["linkedin.com"],
     "blocked": ["/**"],
-    "allowed": []
+    "allowed": [],
+    "release": "stable"
   },
   "threads": {
     "label": "Threads",
     "hosts": ["threads.net"],
     "blocked": ["/**"],
-    "allowed": ["/t/**", "/@*/post/**"]
+    "allowed": ["/t/**", "/@*/post/**"],
+    "release": "alpha"
   },
   "bluesky": {
     "label": "Bluesky",
     "hosts": ["bsky.app"],
     "blocked": ["/**"],
-    "allowed": ["/profile/*/post/**"]
+    "allowed": ["/profile/*/post/**"],
+    "release": "alpha"
   },
   "pinterest": {
     "label": "Pinterest",
     "hosts": ["pinterest.com", "pinterest.co.uk"],
     "blocked": ["/**"],
-    "allowed": []
+    "allowed": [],
+    "release": "alpha"
   }
 }
