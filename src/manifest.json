@@ -29,7 +29,7 @@
   ],
   "browser_specific_settings": {
     "gecko": {
-      "id": "doomscroll-blocker@kuech.dev",
+      "id": "doomscroll-blocker@chriskuech",
       "strict_min_version": "112.0",
       "data_collection_permissions": {
         "required": [],
