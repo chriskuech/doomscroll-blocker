@@ -1,6 +1,8 @@
 # Doomscroll Blocker
 
-Doomscroll Blocker is a browser extension that blocks users from Doom Scrolling major social media sites while allowing them to view specific posts (such as linked from a chat app).
+Doomscroll Blocker is a browser extension that blocks users from doomscrolling major social media sites while allowing them to view specific posts from a link (such as sent by a friend in a chat app).
+
+With Doomscroll Blocker, you are no longer forced to choose between blocking social media sites and viewing memes your friends send you.
 
 ## Blocked Sites
 
@@ -18,3 +20,8 @@ Feed pages and homepages are blocked. Direct links to specific posts, videos, or
 | Threads | Home feed | Individual posts (`/t/*`) |
 | Bluesky | Home feed | Individual posts (`/profile/*/post/*`) |
 | Pinterest | All pages | — |
+
+# Attribution
+
+Scroll graphic by [Angelica Mariotti](https://www.vecteezy.com/members/angelicamari79).
+

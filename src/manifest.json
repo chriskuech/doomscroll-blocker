@@ -3,8 +3,17 @@
   "name": "Doomscroll Blocker",
   "version": "1",
   "description": "Blocks doomscrolling feeds while allowing direct links to specific content",
-
-  "permissions": ["webNavigation", "tabs", "storage"],
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "permissions": [
+    "webNavigation",
+    "tabs",
+    "storage"
+  ],
   "host_permissions": [
     "*://*.reddit.com/*",
     "*://*.twitter.com/*",
@@ -18,21 +27,23 @@
     "*://*.bsky.app/*",
     "*://*.pinterest.com/*"
   ],
-
   "background": {
     "service_worker": "background.js",
     "type": "module"
   },
-
   "action": {
     "default_popup": "popup.html",
     "default_title": "Doomscroll Blocker"
   },
-
   "web_accessible_resources": [
     {
-      "resources": ["blocked.html", "blocked.js"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "blocked.html",
+        "blocked.js"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ]
 }

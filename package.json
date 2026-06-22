@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc && npm run copy-assets",
-    "copy-assets": "cp src/manifest.json src/blocked.html src/popup.html src/denylist.json dist/",
+    "copy-assets": "cp -R src/manifest.json src/blocked.html src/popup.html src/denylist.json src/icons dist/",
     "lint": "eslint src/",
     "watch": "tsc --watch",
     "clean": "rm -rf dist",
