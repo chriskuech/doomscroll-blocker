@@ -58,29 +58,13 @@ jobs:
             dist/manifest.json > dist/manifest.tmp.json
           mv dist/manifest.tmp.json dist/manifest.json
 
-      # Chrome and Edge both accept the same Chrome MV3 zip unchanged
-      - name: Package Chromium extension
-        run: cd dist && zip -r ../extension-chromium.zip .
-
-      # Firefox MV3 (109+) honors the chrome.* namespace, but AMO requires a
-      # gecko extension ID in the manifest — patch it before zipping
-      - name: Package Firefox extension
-        run: |
-          jq '.browser_specific_settings = {
-            "gecko": {
-              "id": "doom-scroll-blocker@kuech.dev",
-              "strict_min_version": "109.0"
-            }
-          }' dist/manifest.json > dist/manifest.tmp.json
-          mv dist/manifest.tmp.json dist/manifest.json
-          cd dist && zip -r ../extension-firefox.zip .
+      - name: Package extension
+        run: cd dist && zip -r ../extension.zip .
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.version.outputs.value }}
           name: v${{ steps.version.outputs.value }}
-          files: |
-            extension-chromium.zip
-            extension-firefox.zip
+          files: extension.zip
           generate_release_notes: true

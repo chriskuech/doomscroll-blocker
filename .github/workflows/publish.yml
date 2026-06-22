@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download release artifact
-        run: gh release download "$RELEASE_TAG" --pattern extension-chromium.zip
+        run: gh release download "$RELEASE_TAG" --pattern extension.zip
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
@@ -31,7 +31,7 @@ jobs:
         run: >
           npx chrome-webstore-upload-cli@3
           upload
-          --source extension-chromium.zip
+          --source extension.zip
           --extension-id "${{ secrets.CHROME_EXTENSION_ID }}"
           --client-id "${{ secrets.CHROME_CLIENT_ID }}"
           --client-secret "${{ secrets.CHROME_CLIENT_SECRET }}"
@@ -43,7 +43,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download release artifact
-        run: gh release download "$RELEASE_TAG" --pattern extension-chromium.zip
+        run: gh release download "$RELEASE_TAG" --pattern extension.zip
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
@@ -58,20 +58,20 @@ jobs:
           --client-id "${{ secrets.EDGE_CLIENT_ID }}"
           --client-secret "${{ secrets.EDGE_CLIENT_SECRET }}"
           --access-token-url "${{ secrets.EDGE_ACCESS_TOKEN_URL }}"
-          --zip ./extension-chromium.zip
+          --zip ./extension.zip
 
   publish-firefox:
     name: Firefox Add-ons (AMO)
     runs-on: ubuntu-latest
     steps:
       - name: Download release artifact
-        run: gh release download "$RELEASE_TAG" --pattern extension-firefox.zip
+        run: gh release download "$RELEASE_TAG" --pattern extension.zip
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
 
       - name: Unzip extension
-        run: unzip extension-firefox.zip -d dist-firefox/
+        run: unzip extension.zip -d dist-firefox/
 
       # Secrets: AMO_JWT_ISSUER, AMO_JWT_SECRET
       # Obtain via: https://addons.mozilla.org/developers/addon/api/key/
@@ -88,13 +88,13 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Download release artifact
-        run: gh release download "$RELEASE_TAG" --pattern extension-chromium.zip
+        run: gh release download "$RELEASE_TAG" --pattern extension.zip
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GH_REPO: ${{ github.repository }}
 
       - name: Unzip extension
-        run: unzip extension-chromium.zip -d dist/
+        run: unzip extension.zip -d dist/
 
       # Write the App Store Connect API private key where Xcode can find it
       # Secrets: APP_STORE_CONNECT_API_KEY (p8 contents), APP_STORE_CONNECT_API_KEY_ID, APP_STORE_CONNECT_ISSUER_ID
