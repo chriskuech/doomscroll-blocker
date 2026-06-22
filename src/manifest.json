@@ -27,8 +27,19 @@
     "*://*.bsky.app/*",
     "*://*.pinterest.com/*"
   ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "doomscroll-blocker@kuech.dev",
+      "strict_min_version": "112.0",
+      "data_collection_permissions": {
+        "required": [],
+        "optional": []
+      }
+    }
+  },
   "background": {
     "service_worker": "background.js",
+    "scripts": ["background.js"],
     "type": "module"
   },
   "action": {
