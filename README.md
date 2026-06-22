@@ -1,6 +1,6 @@
-# Doom-Scroll Blocker
+# Doomscroll Blocker
 
-Doom-Scroll Blocker is a browser extension that blocks users from Doom Scrolling major social media sites while allowing them to view specific posts (such as linked from a chat app).
+Doomscroll Blocker is a browser extension that blocks users from Doom Scrolling major social media sites while allowing them to view specific posts (such as linked from a chat app).
 
 ## Blocked Sites
 
